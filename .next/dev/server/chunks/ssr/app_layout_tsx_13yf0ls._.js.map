@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///C:/Users/user/Desktop/Ancho/Sulertia/app/layout.tsx"],"sourcesContent":["export const metadata = {\r\n  title: 'Sulertia',\r\n  description: 'Sulertia Media',\r\n}\r\n\r\nexport default function RootLayout({\r\n  children,\r\n}: {\r\n  children: React.ReactNode\r\n}) {\r\n  return (\r\n    <html lang=\"ka\">\r\n      <body>{children}</body>\r\n    </html>\r\n  )\r\n}"],"names":["metadata","title","description","RootLayout","children","lang"],"mappings":";;;;;;;;AAAO,MAAMA,WAAW;IACtBC,OAAO;IACPC,aAAa;AACf;AAEe,SAASC,WAAW,EACjCC,QAAQ,EAGT;IACC,qBACE,oOAAC;QAAKC,MAAK;kBACT,cAAA,oOAAC;sBAAMD;;;AAGb"}}]
+}
