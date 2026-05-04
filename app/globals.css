@@ -383,9 +383,9 @@ img {
 
 .robot-video {
   width: 100%;
+  height: auto;
   display: block;
   background: transparent;
-  mix-blend-mode: screen;
 }
 
 @keyframes robotMoveAcross {

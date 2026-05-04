@@ -54,7 +54,7 @@ export default function WalkingRobot() {
       <div className="robot-timer">{timeLeft}</div>
 
       <video className="robot-video" autoPlay muted loop playsInline>
-        <source src="/robot.webm" type="video/mp4" />
+          <source src="/robot.webm" type="video/webm" />
       </video>
     </div>
   );
