@@ -361,10 +361,11 @@ img {
   z-index: 9999;
   pointer-events: none;
   will-change: transform;
+  background: transparent;
 }
 
 .robot-move {
-  animation: robotMoveAcross 10s linear forwards;
+  animation: robotMoveAcross 12s linear forwards;
 }
 
 .robot-timer {
@@ -383,6 +384,8 @@ img {
 .robot-video {
   width: 100%;
   display: block;
+  background: transparent;
+  mix-blend-mode: screen;
 }
 
 @keyframes robotMoveAcross {
@@ -392,5 +395,33 @@ img {
 
   to {
     transform: translateX(calc(100vw + 300px));
+  }
+}
+
+@media (max-width: 700px) {
+  .robot-wrapper {
+    bottom: 12px;
+    left: -90px;
+    width: 86px;
+    z-index: 99999;
+  }
+
+  .robot-move {
+    animation: robotMoveAcrossMobile 9s linear forwards;
+  }
+
+  .robot-timer {
+    top: -26px;
+    font-size: 13px;
+  }
+
+  @keyframes robotMoveAcrossMobile {
+    from {
+      transform: translateX(0);
+    }
+
+    to {
+      transform: translateX(calc(100vw + 180px));
+    }
   }
 }
