@@ -1,3 +1,4 @@
+import "./globals.css";
 import { supabase } from '@/lib/supabaseClient';
 import { splitAtWordCount } from '@/lib/splitAtWordCount';
 import { AdEditorial } from '@/components/AdBanner';
