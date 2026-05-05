@@ -52,18 +52,7 @@ export default function WalkingRobot() {
   return (
     <div key={animationKey} className="robot-wrapper robot-move">
       <div className="robot-timer">{timeLeft}</div>
-
-      <video
-        className="robot-video"
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-      >
-        <source src="/robot.webm" type="video/webm" />
-        <source src="/robot.mp4" type="video/mp4" />
-      </video>
+      <img className="robot-video" src="/robot.apng" alt="Walking robot" />
     </div>
   );
 }
