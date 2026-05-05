@@ -18,6 +18,10 @@ const lora = Lora({
 export const metadata: Metadata = {
   title: "Sulertia Media",
   description: "One story. Chosen by AI.",
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({

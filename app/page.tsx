@@ -31,13 +31,11 @@ export default async function Page() {
     );
   }
 
-  const formattedDate = post.created_at
-    ? new Date(post.created_at).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      })
-    : "May 4, 2026";
+  const formattedDate = new Date().toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
 
   const storyItems =
     (post.content || "")
@@ -107,18 +105,15 @@ export default async function Page() {
               <AdEditorial />
             </div>
 
-            <div className="article-footer">
-              <span>Verified via Sulertia Protocol</span>
-              <span>{formattedDate}</span>
-            </div>
+            <footer>
+              <div className="article-footer">
+                <span>Verified via Sulertia Protocol</span>
+                <span>{formattedDate}</span>
+              </div>
+            </footer>
+
           </div>
         </article>
-
-        <footer className="bottom-note">
-          <div />
-          <span>Analysing Breaking Stories</span>
-          <div />
-        </footer>
       </section>
       <WalkingRobot />
     </main>
