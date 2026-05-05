@@ -52,7 +52,7 @@ export default function WalkingRobot() {
   return (
     <div key={animationKey} className="robot-wrapper robot-move">
       <div className="robot-timer">{timeLeft}</div>
-      <img className="robot-video" src="/robot.gif" alt="Walking robot" />
+      <img className="robot-video" src="/robot_transparent.apng" alt="Walking robot" />
     </div>
   );
 }
