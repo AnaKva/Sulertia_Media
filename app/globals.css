@@ -1,5 +1,13 @@
 @import url("https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Lora:wght@400;500;600;700&display=swap");
 
+@font-face {
+  font-family: "BPG Nino Mtavruli";
+  src: url("/fonts/BPGNinoMtavruli.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --bg: #1a2245;
   --navy: #1a2245;
@@ -23,7 +31,7 @@ body {
 }
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "BPG Nino Mtavruli", Arial, Helvetica, sans-serif;
 }
 
 button {
@@ -61,7 +69,7 @@ img {
 }
 
 .logo {
-  font-family: "Playfair Display", serif;
+  font-family: "BPG Nino Mtavruli", Arial, Helvetica, sans-serif;
   font-size: 18px;
   font-weight: 800;
   letter-spacing: -0.02em;
@@ -71,7 +79,7 @@ img {
 .logo span {
   margin-left: 5px;
   vertical-align: super;
-  font-family: Arial, Helvetica, sans-serif;
+font-family: "BPG Nino Mtavruli", Arial, Helvetica, sans-serif;
   font-size: 9px;
   font-weight: 400;
   letter-spacing: 0.35em;
@@ -183,11 +191,11 @@ img {
 .hero h1 {
   max-width: 520px;
   margin: 0;
-  font-family: "Playfair Display", serif;
+  font-family: "BPG Nino Mtavruli", "Playfair Display", serif;
   font-size: 44px;
-  line-height: 1.05;
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  line-height: 1.2;
+  font-weight: 400;
+  letter-spacing: 0.01em;
   color: var(--cream);
 }
 
@@ -212,7 +220,7 @@ img {
 }
 
 .story-text {
-  font-family: "Lora", serif;
+  font-family: "BPG Nino Mtavruli", "Lora", serif;
   font-size: 16px;
   line-height: 2;
   color: rgba(245, 239, 230, 0.9);
@@ -238,6 +246,9 @@ img {
 
 .numbered-index {
   font-size: 24px;
+  color: var(--orange);
+  font-family: "Playfair Display", serif;
+  line-height: 1.8;
 }
 
 .numbered-row {
@@ -245,6 +256,44 @@ img {
   grid-template-columns: 34px 1fr;
   column-gap: 12px;
   align-items: start;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(170, 122, 92, 0.1);
+}
+
+.numbered-row:last-child {
+  border-bottom: none;
+}
+
+/* ── Typewriter animation ── */
+.typewriter-line {
+  display: inline-block;
+  overflow: hidden;
+  white-space: normal;
+  color: rgba(245, 239, 230, 0.5);
+}
+
+.typewriter-active {
+  color: rgba(245, 239, 230, 0.9);
+}
+
+.typewriter-active::after {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: var(--orange);
+  margin-left: 3px;
+  vertical-align: text-bottom;
+  animation: blink 0.7s step-end infinite;
+}
+
+.typewriter-done {
+  color: rgba(245, 239, 230, 0.88);
+}
+
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
 }
 
 .article-footer {

@@ -4,6 +4,7 @@ export const revalidate = 0;
 import WalkingRobot from "@/components/WalkingRobot";
 import { supabase } from "@/lib/supabaseClient";
 import { AdEditorial } from "@/components/AdBanner";
+import TypewriterStory from "@/components/TypewriterStory";
 
 export default async function Page() {
   let { data: post, error } = await supabase
@@ -43,7 +44,7 @@ export default async function Page() {
   const storyItems =
     (post.content || "")
       .match(/\d+\.\s[\s\S]*?(?=(?:\s+\d+\.\s)|$)/g)
-      ?.map((item: string) => item.trim()) || [];
+      ?.map((item: string) => item.replace(/^\d+\.\s*/, "").trim()) || [];
 
   return (
     <main className="page">
@@ -87,18 +88,9 @@ export default async function Page() {
           </div>
 
           <div className="article-body">
-            <div className="story-text numbered-story">
+            <div className="story-text">
               {storyItems.length > 0 ? (
-                storyItems.map((item: string, index: number) => {
-                  const cleanText = item.replace(/^\d+\.\s*/, "").trim();
-
-                  return (
-                    <div className="numbered-row" key={index}>
-                      <span className="numbered-index">{index + 1}.</span>
-                      <span className="numbered-content">{cleanText}</span>
-                    </div>
-                  );
-                })
+                <TypewriterStory items={storyItems} />
               ) : (
                 <p>{post.content}</p>
               )}
@@ -114,7 +106,6 @@ export default async function Page() {
                 <span>{formattedDate}</span>
               </div>
             </footer>
-
           </div>
         </article>
       </section>
