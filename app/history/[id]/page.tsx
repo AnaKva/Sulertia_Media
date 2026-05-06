@@ -38,6 +38,7 @@ export async function generateMetadata({
   }
 
   const postTitle = lang === "en" ? post.title_en || post.title : post.title;
+
   const postContent =
     lang === "en" ? post.content_en || post.content : post.content;
 
