@@ -259,8 +259,7 @@ def run_brain():
         now = datetime.now(GEORGIA_TZ)
         today = now.date()
 
-        # ტესტირებისთვის True, რეალურისთვის: (now.hour == 7 and now.minute < 5 and last_post_date != today)
-        if True: 
+        if now.hour == 7 and now.minute < 5 and last_post_date != today: 
             print("⏰ ვიწყებ მუშაობას...")
             digest_list = gather_exactly_7()
 
