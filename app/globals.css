@@ -69,7 +69,7 @@ img {
 }
 
 .logo {
-  font-family: "BPG Nino Mtavruli", Arial, Helvetica, sans-serif;
+  font-family: "Playfair Display", serif;
   font-size: 18px;
   font-weight: 800;
   letter-spacing: -0.02em;
@@ -79,7 +79,7 @@ img {
 .logo span {
   margin-left: 5px;
   vertical-align: super;
-font-family: "BPG Nino Mtavruli", Arial, Helvetica, sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
   font-size: 9px;
   font-weight: 400;
   letter-spacing: 0.35em;
@@ -472,5 +472,198 @@ font-family: "BPG Nino Mtavruli", Arial, Helvetica, sans-serif;
     to {
       transform: translateX(calc(100vw + 180px));
     }
+  }
+}
+/* ── About Page ── */
+.nav-link {
+  color: inherit;
+  text-decoration: none;
+  text-transform: uppercase;
+  letter-spacing: 0.35em;
+  font-size: 9px;
+}
+
+.nav-link:hover {
+  color: var(--cream);
+}
+
+.about-card {
+  width: 100%;
+  max-width: 630px;
+  margin: 0 auto;
+  border-left: 2px solid var(--orange);
+}
+
+.about-banner {
+  background: var(--navy-dark);
+  padding: 52px 32px 40px;
+  border-bottom: 1px solid rgba(185, 90, 42, 0.2);
+}
+
+.about-banner-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.38em;
+  color: rgba(185, 90, 42, 0.7);
+  margin-bottom: 18px;
+}
+
+.about-title {
+  font-family: "BPG Nino Mtavruli", "Playfair Display", serif;
+  font-size: 42px;
+  font-weight: 400;
+  line-height: 1.15;
+  letter-spacing: 0.01em;
+  color: var(--cream);
+  margin: 0 0 14px;
+}
+
+.about-subtitle {
+  font-family: "BPG Nino Mtavruli", serif;
+  font-size: 15px;
+  color: rgba(245, 239, 230, 0.5);
+  margin: 0 0 28px;
+  letter-spacing: 0.04em;
+}
+
+.about-banner-line {
+  width: 48px;
+  height: 2px;
+  background: var(--orange);
+}
+
+.about-section {
+  background: var(--navy);
+  padding: 32px 32px;
+}
+
+.about-section-tag {
+  display: block;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.38em;
+  color: rgba(185, 90, 42, 0.7);
+  margin-bottom: 20px;
+}
+
+.about-body {
+  font-family: "BPG Nino Mtavruli", "Lora", serif;
+  font-size: 15px;
+  line-height: 1.9;
+  color: rgba(245, 239, 230, 0.82);
+  margin: 0;
+}
+
+.about-divider {
+  height: 1px;
+  background: rgba(170, 122, 92, 0.15);
+}
+
+/* Steps */
+.about-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.about-step {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.about-step-n {
+  font-family: "Playfair Display", serif;
+  font-size: 22px;
+  color: var(--orange);
+  line-height: 1.3;
+  opacity: 0.7;
+}
+
+.about-step-title {
+  font-family: "BPG Nino Mtavruli", serif;
+  font-size: 13px;
+  font-weight: 400;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--cream);
+  margin-bottom: 4px;
+}
+
+.about-step-body {
+  font-family: "BPG Nino Mtavruli", "Lora", serif;
+  font-size: 14px;
+  line-height: 1.7;
+  color: rgba(245, 239, 230, 0.55);
+}
+
+/* Stats */
+.about-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1px;
+  background: rgba(170, 122, 92, 0.15);
+}
+
+.about-stat {
+  background: var(--navy);
+  padding: 20px 16px;
+  text-align: center;
+}
+
+.about-stat-value {
+  font-family: "Playfair Display", serif;
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--orange);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+
+.about-stat-label {
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.25em;
+  color: rgba(245, 239, 230, 0.4);
+  line-height: 1.4;
+}
+
+/* Footer row */
+.about-footer-row {
+  background: var(--navy);
+  border-top: 1px solid rgba(170, 122, 92, 0.18);
+  padding: 20px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: rgba(255, 255, 255, 0.22);
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+}
+
+@media (max-width: 700px) {
+  .about-banner {
+    padding: 36px 22px 28px;
+  }
+
+  .about-title {
+    font-size: 30px;
+  }
+
+  .about-section {
+    padding: 26px 22px;
+  }
+
+  .about-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .about-footer-row {
+    padding: 18px 22px;
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
   }
 }

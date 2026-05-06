@@ -13,9 +13,16 @@ export default function TypewriterStory({ items }: Props) {
   const [currentItem, setCurrentItem] = useState(0);
   const [currentChar, setCurrentChar] = useState(0);
   const [doneItems, setDoneItems] = useState<boolean[]>(items.map(() => false));
+  const [started, setStarted] = useState(false);
   const rafRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
+    const startDelay = setTimeout(() => setStarted(true), 120);
+    return () => clearTimeout(startDelay);
+  }, []);
+
+  useEffect(() => {
+    if (!started) return;
     if (currentItem >= items.length) return;
 
     const text = items[currentItem];
@@ -30,7 +37,6 @@ export default function TypewriterStory({ items }: Props) {
         setCurrentChar((c) => c + 1);
       }, 22);
     } else {
-      // Line done — remove cursor from this line, move to next
       setDoneItems((prev) => {
         const next = [...prev];
         next[currentItem] = true;
@@ -45,27 +51,34 @@ export default function TypewriterStory({ items }: Props) {
     return () => {
       if (rafRef.current) clearTimeout(rafRef.current);
     };
-  }, [currentItem, currentChar, items]);
+  }, [started, currentItem, currentChar, items]);
 
   return (
     <div className="numbered-story">
-      {items.map((_, index) => (
-        <div className="numbered-row" key={index}>
-          <span className="numbered-index">{index + 1}.</span>
-          <span
-            className={[
-              "numbered-content",
-              "typewriter-line",
-              index === currentItem ? "typewriter-active" : "",
-              doneItems[index] ? "typewriter-done" : "",
-            ]
-              .filter(Boolean)
-              .join(" ")}
-          >
-            {displayedItems[index]}
-          </span>
-        </div>
-      ))}
+      {items.map((fullText, index) => {
+        const isActive = index === currentItem && started;
+        const isDone = doneItems[index];
+        const text = isDone || !started ? fullText : displayedItems[index];
+
+        return (
+          <div className="numbered-row" key={index}>
+            <span className="numbered-index">{index + 1}.</span>
+            <span
+              className={[
+                "numbered-content",
+                "typewriter-line",
+                isActive ? "typewriter-active" : "",
+                isDone ? "typewriter-done" : "",
+                !started ? "typewriter-done" : "",
+              ]
+                .filter(Boolean)
+                .join(" ")}
+            >
+              {text}
+            </span>
+          </div>
+        );
+      })}
     </div>
   );
 }

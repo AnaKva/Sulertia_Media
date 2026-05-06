@@ -60,6 +60,7 @@ export default async function Page() {
               <span />
               AI Scanning
             </div>
+            <a href="/about" className="nav-link">About</a>
             <button>History Vault</button>
           </nav>
         </div>
