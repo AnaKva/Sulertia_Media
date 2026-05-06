@@ -1,12 +1,24 @@
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
+import Link from "next/link";
 import WalkingRobot from "@/components/WalkingRobot";
 import { supabase } from "@/lib/supabaseClient";
 import { AdEditorial } from "@/components/AdBanner";
 import TypewriterStory from "@/components/TypewriterStory";
+import { getDailyImage } from "@/lib/getDailyImage";
+import { getLang, t } from "@/lib/i18n";
+import LanguageSwitch from "@/components/LanguageSwitch";
 
-export default async function Page() {
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+export default async function Page({
+  searchParams,
+}: {
+  searchParams?: Promise<{ lang?: string }>;
+}) {
+  const resolvedSearchParams = await searchParams;
+  const lang = getLang(resolvedSearchParams?.lang);
+  const text = t[lang];
+
   let { data: post, error } = await supabase
     .from("posts")
     .select("*")
@@ -29,20 +41,34 @@ export default async function Page() {
       <main className="offline-page">
         <div className="offline-box">
           <span className="offline-dot" />
-          <p>Waiting for AI Agent to select a post...</p>
+          <p>{text.waiting}</p>
         </div>
       </main>
     );
   }
 
-  const formattedDate = new Date().toLocaleDateString("en-US", {
-    month: "short",
-    day: "numeric",
-    year: "numeric",
-  });
+  const postTitle =
+    lang === "en" ? post.title_en || post.title : post.title;
+
+  const postContent =
+    lang === "en" ? post.content_en || post.content : post.content;
+
+  const postCategory =
+    lang === "en"
+      ? post.category_en || post.category || text.categoryFallback
+      : post.category || text.categoryFallback;
+
+  const formattedDate = new Date().toLocaleDateString(
+    lang === "ka" ? "ka-GE" : "en-US",
+    {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }
+  );
 
   const storyItems =
-    (post.content || "")
+    (postContent || "")
       .match(/\d+\.\s[\s\S]*?(?=(?:\s+\d+\.\s)|$)/g)
       ?.map((item: string) => item.replace(/^\d+\.\s*/, "").trim()) || [];
 
@@ -50,18 +76,28 @@ export default async function Page() {
     <main className="page">
       <header className="top-header">
         <div className="top-header-inner">
-          <div className="logo">
-            SULERTIA
-            <span>MEDIA</span>
-          </div>
+          <Link href={`/?lang=${lang}`} className="logo-link">
+            <div className="logo">
+              SULERTIA
+              <span>MEDIA</span>
+            </div>
+          </Link>
 
           <nav className="nav">
             <div className="scan-status">
               <span />
-              AI Scanning
+              {text.aiScanning}
             </div>
-            <a href="/about" className="nav-link">About</a>
-            <button>History Vault</button>
+
+            <Link href={`/about?lang=${lang}`} className="nav-link">
+              About
+            </Link>
+
+            <Link href={`/history?lang=${lang}`} className="nav-link">
+              {text.historyVault}
+            </Link>
+
+            <LanguageSwitch lang={lang} />
           </nav>
         </div>
       </header>
@@ -69,22 +105,21 @@ export default async function Page() {
       <section className="content-shell">
         <article className="article-card">
           <div className="hero">
-            {post.image_url && <img src={post.image_url} alt={post.title} />}
+            <img src={getDailyImage()} alt={postTitle} />
 
             <div className="hero-overlay" />
 
             <div className="hero-content">
               <div className="meta-row">
-                <span className="category">
-                  {post.category || "Artificial Intelligence"}
-                </span>
+                <span className="category">{postCategory}</span>
 
                 <span className="date-score">
-                  {formattedDate} · AI Score: {post.importance_score || "8.5"}
+                  {formattedDate} · {text.score}:{" "}
+                  {post.importance_score || "8.5"}
                 </span>
               </div>
 
-              <h1>{post.title}</h1>
+              <h1>{postTitle}</h1>
             </div>
           </div>
 
@@ -93,7 +128,7 @@ export default async function Page() {
               {storyItems.length > 0 ? (
                 <TypewriterStory items={storyItems} />
               ) : (
-                <p>{post.content}</p>
+                <p>{postContent}</p>
               )}
             </div>
 
@@ -103,13 +138,14 @@ export default async function Page() {
 
             <footer>
               <div className="article-footer">
-                <span>Verified via Sulertia Protocol</span>
+                <span>{text.verified}</span>
                 <span>{formattedDate}</span>
               </div>
             </footer>
           </div>
         </article>
       </section>
+
       <WalkingRobot />
     </main>
   );
