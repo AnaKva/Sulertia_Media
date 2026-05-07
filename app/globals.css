@@ -1166,3 +1166,297 @@ font-family: "BPG Nino Mtavruli", Arial, Helvetica, sans-serif;
   visibility: hidden;
   pointer-events: none;
 }
+/* ─────────────────────────────────────────────
+   Minimal Motion Upgrade Layer
+   Safe to keep at the bottom of globals.css
+   ───────────────────────────────────────────── */
+
+/* ── Main Page + History Detail Hero Entrance ── */
+.hero {
+  animation: heroReveal 0.8s ease-out both;
+  will-change: transform, opacity;
+}
+
+.hero img {
+  animation: heroImageDrift 8s ease-out forwards;
+  transform-origin: center;
+  will-change: transform;
+}
+
+.hero-overlay {
+  animation: heroOverlayFade 1s ease-out both;
+}
+
+.hero-content {
+  animation: heroContentUp 0.9s ease-out 0.15s both;
+  will-change: transform, opacity;
+}
+
+@keyframes heroReveal {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroImageDrift {
+  from {
+    transform: scale(1.04);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+@keyframes heroOverlayFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes heroContentUp {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── AI Scan Line On Hero ── */
+.hero::after {
+  content: "";
+  position: absolute;
+  left: -20%;
+  right: -20%;
+  top: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(185, 90, 42, 0.9),
+    rgba(245, 239, 230, 0.45),
+    transparent
+  );
+  box-shadow: 0 0 18px rgba(185, 90, 42, 0.45);
+  opacity: 0;
+  animation: heroScanLine 1.8s ease-out 0.4s both;
+  pointer-events: none;
+  z-index: 4;
+}
+
+@keyframes heroScanLine {
+  0% {
+    top: 0%;
+    opacity: 0;
+  }
+  12% {
+    opacity: 1;
+  }
+  85% {
+    opacity: 1;
+  }
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+/* ── Header Nav Signal Underline ── */
+.nav-link,
+.language-switch a {
+  position: relative;
+}
+
+.nav-link::after,
+.language-switch a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -7px;
+  width: 100%;
+  height: 1px;
+  background: var(--orange);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.25s ease;
+  opacity: 0.8;
+}
+
+.nav-link:hover::after,
+.language-switch a:hover::after,
+.language-switch .language-active::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+
+/* ── History Page Entrance ── */
+.history-heading {
+  animation: historyHeadingReveal 0.75s ease-out both;
+}
+
+.history-search-wrap {
+  animation: historyHeadingReveal 0.75s ease-out 0.08s both;
+}
+
+.history-list {
+  animation: historyListReveal 0.8s ease-out 0.12s both;
+}
+
+@keyframes historyHeadingReveal {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes historyListReveal {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── History Card Premium Hover ── */
+.history-card-with-thumb {
+  position: relative;
+  overflow: hidden;
+  transition:
+    border-color 0.25s ease,
+    background 0.25s ease,
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.history-card-link:hover .history-card-with-thumb {
+  border-color: rgba(185, 90, 42, 0.9);
+  background: rgba(0, 0, 0, 0.18);
+  transform: translateY(-4px);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18);
+}
+
+.history-thumb img {
+  transition: transform 0.55s ease, opacity 0.35s ease;
+}
+
+.history-card-link:hover .history-thumb img {
+  transform: scale(1.06);
+  opacity: 0.9;
+}
+
+.history-card h2 {
+  transition: color 0.25s ease;
+}
+
+.history-card-link:hover .history-card h2 {
+  color: #fff7ef;
+}
+
+/* ── About Page Staggered Reveal ── */
+.about-card {
+  animation: aboutCardReveal 0.75s ease-out both;
+  will-change: transform, opacity;
+}
+
+.about-banner {
+  animation: aboutBlockReveal 0.7s ease-out 0.05s both;
+}
+
+.about-section {
+  animation: aboutBlockReveal 0.7s ease-out both;
+}
+
+.about-section:nth-of-type(1) {
+  animation-delay: 0.12s;
+}
+
+.about-section:nth-of-type(2) {
+  animation-delay: 0.2s;
+}
+
+.about-section:nth-of-type(3) {
+  animation-delay: 0.28s;
+}
+
+.about-section:nth-of-type(4) {
+  animation-delay: 0.36s;
+}
+
+.about-step,
+.about-stat {
+  transition: transform 0.25s ease, background 0.25s ease, opacity 0.25s ease;
+}
+
+.about-step:hover,
+.about-stat:hover {
+  transform: translateX(4px);
+  background: rgba(0, 0, 0, 0.08);
+}
+
+@keyframes aboutCardReveal {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes aboutBlockReveal {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Small Interactive Polish ── */
+.category,
+.about-banner-line,
+.loading-border-accent {
+  box-shadow: 0 0 0 rgba(185, 90, 42, 0);
+}
+
+.category:hover {
+  box-shadow: 0 0 18px rgba(185, 90, 42, 0.18);
+}
+
+.article-body,
+.about-section,
+.history-card {
+  transition: border-color 0.25s ease, background 0.25s ease;
+}
+
+/* ── Accessibility: Respect Reduced Motion ── */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.001ms !important;
+  }
+}
