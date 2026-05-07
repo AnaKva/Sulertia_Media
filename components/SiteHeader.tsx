@@ -13,12 +13,13 @@ export default function SiteHeader({ lang }: SiteHeaderProps) {
   return (
     <header className="top-header">
       <div className="top-header-inner">
-        <Link href={`/?lang=${lang}`} className="logo-link" aria-label="Sulertia Media home">
-          <div className="logo">
-            SULERTIA
-            <span>MEDIA</span>
-          </div>
-        </Link>
+       <Link href={`/?lang=${lang}`} className="logo-link header-logo-link">
+  <img
+    src="/images/sulertia-logo.png"
+    alt="Sulertia Media"
+    className="header-logo-img"
+  />
+</Link>
 
         <nav className="nav" aria-label="Main navigation">
           <Link href={`/?lang=${lang}`} className="nav-link">

@@ -6,9 +6,11 @@ export default function LoadingScreen() {
       <div className="loading-border-accent" />
 
       <div className="loading-logo">
-        <div className="loading-wordmark">
-          SULERTIA<span>MEDIA</span>
-        </div>
+        <img
+          src="/images/sulertia-logo.png"
+          alt="Sulertia Media"
+          className="loading-logo-img"
+        />
 
         <div className="loading-signal">
           <div className="loading-bar" />

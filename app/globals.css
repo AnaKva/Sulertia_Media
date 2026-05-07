@@ -234,7 +234,7 @@ font-family: "BPG Nino Mtavruli", Arial, Helvetica, sans-serif;
   float: left;
   margin-right: 12px;
   margin-top: 4px;
-  font-family: "Playfair Display", serif;
+  font-family: "BPG Nino Mtavruli";
   font-size: 50px;
   line-height: 0.9;
   font-weight: 800;
@@ -247,7 +247,7 @@ font-family: "BPG Nino Mtavruli", Arial, Helvetica, sans-serif;
 .numbered-index {
   font-size: 24px;
   color: var(--orange);
-  font-family: "Playfair Display", serif;
+  font-family: "BPG Nino Mtavruli";
   line-height: 1.8;
 }
 
@@ -472,7 +472,7 @@ font-family: "BPG Nino Mtavruli", Arial, Helvetica, sans-serif;
   left: 50%;
   transform: translateX(-50%);
   color: #ff3b3b;
-  font-family: monospace;
+  font-family: "BPG Nino Mtavruli";
   font-size: 18px;
   font-weight: 700;
   white-space: nowrap;
@@ -568,7 +568,7 @@ font-family: "BPG Nino Mtavruli", Arial, Helvetica, sans-serif;
 
 .history-heading h1 {
   margin: 0;
-  font-family: "Playfair Display", serif;
+  font-family: "BPG Nino Mtavruli";
   font-size: 52px;
   line-height: 1;
   color: var(--cream);
@@ -577,7 +577,7 @@ font-family: "BPG Nino Mtavruli", Arial, Helvetica, sans-serif;
 .history-heading span {
   display: block;
   margin-top: 14px;
-  font-family: "Lora", serif;
+  font-family: "BPG Nino Mtavruli";
   font-size: 14px;
   color: rgba(245, 239, 230, 0.55);
 }
@@ -609,7 +609,7 @@ font-family: "BPG Nino Mtavruli", Arial, Helvetica, sans-serif;
 
 .history-card h2 {
   margin: 16px 0 12px;
-  font-family: "Playfair Display", serif;
+  font-family: "BPG Nino Mtavruli";
   font-size: 28px;
   line-height: 1.15;
   color: var(--cream);
@@ -617,7 +617,7 @@ font-family: "BPG Nino Mtavruli", Arial, Helvetica, sans-serif;
 
 .history-card p {
   margin: 0;
-  font-family: "Lora", serif;
+  font-family: "BPG Nino Mtavruli";
   font-size: 14px;
   line-height: 1.8;
   color: rgba(245, 239, 230, 0.72);
@@ -636,7 +636,7 @@ font-family: "BPG Nino Mtavruli", Arial, Helvetica, sans-serif;
 
 .history-empty,
 .history-error {
-  font-family: "Lora", serif;
+  font-family: "BPG Nino Mtavruli";
   color: rgba(245, 239, 230, 0.65);
 }
 
@@ -742,7 +742,7 @@ font-family: "BPG Nino Mtavruli", Arial, Helvetica, sans-serif;
   background: rgba(0, 0, 0, 0.12);
   color: var(--cream);
   padding: 15px 18px;
-  font-family: "Lora", serif;
+  font-family: "BPG Nino Mtavruli";
   font-size: 14px;
   outline: none;
 }
@@ -914,7 +914,7 @@ font-family: "BPG Nino Mtavruli", Arial, Helvetica, sans-serif;
 }
 
 .about-step-n {
-  font-family: "Playfair Display", serif;
+  font-family: "BPG Nino Mtavruli";
   font-size: 22px;
   color: var(--orange);
   line-height: 1.3;
@@ -953,7 +953,7 @@ font-family: "BPG Nino Mtavruli", Arial, Helvetica, sans-serif;
 }
 
 .about-stat-value {
-  font-family: "Playfair Display", serif;
+  font-family: "BPG Nino Mtavruli";
   font-size: 28px;
   font-weight: 700;
   color: var(--orange);
@@ -1289,6 +1289,8 @@ font-family: "BPG Nino Mtavruli", Arial, Helvetica, sans-serif;
   }
 }
 
+
+
 /* ── Startup Splash Screen ── */
 .splash-screen {
   position: fixed;
@@ -1601,5 +1603,262 @@ font-family: "BPG Nino Mtavruli", Arial, Helvetica, sans-serif;
     animation-iteration-count: 1 !important;
     scroll-behavior: auto !important;
     transition-duration: 0.001ms !important;
+  }
+}
+/* ── Header Image Logo ── */
+.header-logo-link {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+  flex-shrink: 0;
+}
+
+.header-logo-img {
+  width: 100px;
+  height: auto;
+  display: block;
+  object-fit: contain;
+}
+
+/* Optional hover polish */
+.header-logo-link:hover .header-logo-img {
+  transform: translateY(-1px);
+  opacity: 0.92;
+}
+
+.header-logo-img {
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+@media (max-width: 700px) {
+  .header-logo-img {
+    width: 128px;
+  }
+}
+@media (max-width: 700px) {
+  .header-logo-img {
+    width: 105px;
+  }
+}
+/* ─────────────────────────────────────────────
+   Flashy Minimal Motion Additions
+   Main / History Vault / About
+   Safe bottom layer for Sulertia Media
+   ───────────────────────────────────────────── */
+
+/* 1) Main Page + History Detail: AI Signal Pulse on article */
+.article-card {
+  position: relative;
+}
+
+.article-card::before {
+  content: "";
+  position: absolute;
+  left: -2px;
+  top: 0;
+  width: 2px;
+  height: 100%;
+  background: var(--orange);
+  box-shadow: 0 0 18px rgba(185, 90, 42, 0.45);
+  animation: sulertiaSignalPulse 2.8s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 8;
+}
+
+@keyframes sulertiaSignalPulse {
+  0%,
+  100% {
+    opacity: 0.3;
+    box-shadow: 0 0 8px rgba(185, 90, 42, 0.2);
+  }
+
+  50% {
+    opacity: 1;
+    box-shadow: 0 0 24px rgba(185, 90, 42, 0.65);
+  }
+}
+
+/* 2) Main Page: Meta/category micro-glow */
+.category {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.category::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -130%;
+  width: 80%;
+  height: 100%;
+  background: linear-gradient(
+    110deg,
+    transparent,
+    rgba(255, 255, 255, 0.35),
+    transparent
+  );
+  transform: skewX(-18deg);
+  transition: left 0.55s ease;
+  pointer-events: none;
+}
+
+.hero:hover .category {
+  transform: translateY(-1px);
+  box-shadow: 0 0 20px rgba(185, 90, 42, 0.22);
+}
+
+.hero:hover .category::after {
+  left: 140%;
+}
+
+/* 3) History Vault: archive card shine sweep */
+.history-card-with-thumb {
+  position: relative;
+  overflow: hidden;
+}
+
+.history-card-with-thumb::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(
+    110deg,
+    transparent,
+    rgba(245, 239, 230, 0.08),
+    transparent
+  );
+  transform: skewX(-18deg);
+  transition: left 0.7s ease;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.history-card-link:hover .history-card-with-thumb::after {
+  left: 130%;
+}
+
+/* 4) History Detail: numbered story rows reveal smoothly */
+.numbered-story .numbered-row {
+  opacity: 0;
+  transform: translateY(10px);
+  animation: sulertiaStoryRowReveal 0.45s ease-out both;
+}
+
+.numbered-story .numbered-row:nth-child(1) { animation-delay: 0.05s; }
+.numbered-story .numbered-row:nth-child(2) { animation-delay: 0.12s; }
+.numbered-story .numbered-row:nth-child(3) { animation-delay: 0.19s; }
+.numbered-story .numbered-row:nth-child(4) { animation-delay: 0.26s; }
+.numbered-story .numbered-row:nth-child(5) { animation-delay: 0.33s; }
+.numbered-story .numbered-row:nth-child(6) { animation-delay: 0.4s; }
+.numbered-story .numbered-row:nth-child(7) { animation-delay: 0.47s; }
+.numbered-story .numbered-row:nth-child(8) { animation-delay: 0.54s; }
+.numbered-story .numbered-row:nth-child(9) { animation-delay: 0.61s; }
+.numbered-story .numbered-row:nth-child(10) { animation-delay: 0.68s; }
+
+@keyframes sulertiaStoryRowReveal {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* 5) About Page: stats glow cards */
+.about-stat {
+  position: relative;
+  overflow: hidden;
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.about-stat::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at top,
+    rgba(185, 90, 42, 0.18),
+    transparent 56%
+  );
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.about-stat:hover {
+  transform: translateY(-4px);
+  background: rgba(0, 0, 0, 0.12);
+  box-shadow: 0 14px 28px rgba(0, 0, 0, 0.16);
+}
+
+.about-stat:hover::before {
+  opacity: 1;
+}
+
+.about-stat-value,
+.about-stat-label {
+  position: relative;
+  z-index: 1;
+}
+
+/* 6) About Page: step number glow */
+.about-step-n {
+  transition: opacity 0.25s ease, text-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.about-step:hover .about-step-n {
+  opacity: 1;
+  transform: translateY(-1px);
+  text-shadow: 0 0 16px rgba(185, 90, 42, 0.45);
+}
+
+/* 7) Header logo premium hover */
+.header-logo-link:hover .header-logo-img,
+.logo-link:hover .logo {
+  filter: drop-shadow(0 0 10px rgba(185, 90, 42, 0.2));
+}
+
+/* Keep Facebook share icon safe from hero image animations */
+.hero .facebook-share-icon,
+.hero-facebook-share img {
+  animation: none !important;
+  transform: none;
+}
+
+.facebook-share-button:hover .facebook-share-icon,
+.facebook-share-button:hover img {
+  filter: drop-shadow(0 0 10px rgba(185, 90, 42, 0.28));
+}
+
+/* Mobile: reduce flashy movement slightly */
+@media (max-width: 700px) {
+  .article-card::before {
+    opacity: 0.45;
+    box-shadow: 0 0 12px rgba(185, 90, 42, 0.35);
+  }
+
+  .about-stat:hover,
+  .history-card-link:hover .history-card-with-thumb {
+    transform: translateY(-2px);
+  }
+}
+.loading-logo-img {
+  width: 260px;
+  max-width: 90vw;
+  height: auto;
+  display: block;
+  margin: 0 auto;
+  object-fit: contain;
+}
+
+@media (max-width: 700px) {
+  .loading-logo-img {
+    width: 190px;
   }
 }

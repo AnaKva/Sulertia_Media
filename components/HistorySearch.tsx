@@ -19,6 +19,59 @@ type HistoryPost = {
   is_current: boolean | null;
 };
 
+const MONTHS = {
+  en: [
+    "Jan",
+    "Feb",
+    "Mar",
+    "Apr",
+    "May",
+    "Jun",
+    "Jul",
+    "Aug",
+    "Sep",
+    "Oct",
+    "Nov",
+    "Dec",
+  ],
+  ka: [
+    "იან.",
+    "თებ.",
+    "მარ.",
+    "აპრ.",
+    "მაი.",
+    "ივნ.",
+    "ივლ.",
+    "აგვ.",
+    "სექ.",
+    "ოქტ.",
+    "ნოე.",
+    "დეკ.",
+  ],
+};
+
+function formatPostDate(dateValue: string | null, lang: Lang) {
+  if (!dateValue) return "Unknown date";
+
+  const dateOnly = dateValue.slice(0, 10);
+  const [year, month, day] = dateOnly.split("-");
+
+  if (!year || !month || !day) return "Unknown date";
+
+  const monthIndex = Number(month) - 1;
+  const dayNumber = Number(day);
+
+  if (Number.isNaN(monthIndex) || Number.isNaN(dayNumber)) {
+    return "Unknown date";
+  }
+
+  if (lang === "ka") {
+    return `${dayNumber} ${MONTHS.ka[monthIndex]} ${year}`;
+  }
+
+  return `${MONTHS.en[monthIndex]} ${dayNumber}, ${year}`;
+}
+
 export default function HistorySearch({
   posts,
   lang,
@@ -38,21 +91,14 @@ export default function HistorySearch({
 
     return posts.filter((post) => {
       const title = lang === "en" ? post.title_en || post.title : post.title;
+
       const content =
         lang === "en" ? post.content_en || post.content : post.content;
+
       const category =
         lang === "en" ? post.category_en || post.category : post.category;
 
-      const formattedDate = post.created_at
-        ? new Date(post.created_at).toLocaleDateString(
-            lang === "ka" ? "ka-GE" : "en-US",
-            {
-              month: "short",
-              day: "numeric",
-              year: "numeric",
-            }
-          )
-        : "";
+      const formattedDate = formatPostDate(post.created_at, lang);
 
       const searchableText = [
         title,
@@ -99,16 +145,7 @@ export default function HistorySearch({
                 ? post.category_en || post.category || text.categoryFallback
                 : post.category || text.categoryFallback;
 
-            const formattedDate = post.created_at
-              ? new Date(post.created_at).toLocaleDateString(
-                  lang === "ka" ? "ka-GE" : "en-US",
-                  {
-                    month: "short",
-                    day: "numeric",
-                    year: "numeric",
-                  }
-                )
-              : "Unknown date";
+            const formattedDate = formatPostDate(post.created_at, lang);
 
             const preview =
               typeof postContent === "string"
@@ -142,6 +179,7 @@ export default function HistorySearch({
                       <span>
                         {text.score}: {post.importance_score || "8.5"}
                       </span>
+
                       {post.is_current && <strong>{text.current}</strong>}
                     </div>
                   </div>
