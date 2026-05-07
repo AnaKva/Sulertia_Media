@@ -3,6 +3,7 @@ import SiteHeader from "@/components/SiteHeader";
 import { supabase } from "@/lib/supabaseClient";
 import { AdEditorial } from "@/components/AdBanner";
 import TypewriterStory from "@/components/TypewriterStory";
+import FacebookShareButton from "@/components/FacebookShareButton";
 import { getDailyImage } from "@/lib/getDailyImage";
 import { getLang, t } from "@/lib/i18n";
 
@@ -98,13 +99,27 @@ export default async function Page({
                 </div>
 
                 <h1>{postTitle}</h1>
+
+                <div className="hero-facebook-share">
+                  <FacebookShareButton
+                    url={`https://sulertia.media/?lang=${lang}`}
+                    label={
+                      lang === "ka"
+                        ? "Facebook-ზე გაზიარება"
+                        : "Share on Facebook"
+                    }
+                  />
+                </div>
               </div>
             </div>
 
             <div className="article-body">
               <div className="story-text">
                 {storyItems.length > 0 ? (
-                  <TypewriterStory items={storyItems} />
+                  <TypewriterStory
+                    key={`${lang}-${post.id}`}
+                    items={storyItems}
+                  />
                 ) : (
                   <p>{postContent}</p>
                 )}

@@ -954,3 +954,82 @@ font-family: "BPG Nino Mtavruli", Arial, Helvetica, sans-serif;
     align-items: flex-start;
   }
 }
+
+.hero-title-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+}
+
+.hero-title-row h1 {
+  flex: 1;
+}
+
+.hero-title-row .facebook-share-button {
+  flex: 0 0 auto;
+  margin-bottom: 10px;
+}
+
+.hero-facebook-share {
+  position: absolute;
+  right: 34px;
+  bottom: 76px;
+  z-index: 10;
+}
+
+.facebook-share-button {
+  width: 38px;
+  height: 38px;
+  border: none;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  overflow: visible;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.facebook-share-button:hover {
+  transform: translateY(-1px) scale(1.08);
+  opacity: 0.85;
+}
+
+/* Important: this overrides .hero img */
+.hero .facebook-share-icon {
+  width: 34px;
+  height: 34px;
+  max-width: 34px;
+  max-height: 34px;
+  object-fit: contain;
+  display: block;
+  background: transparent;
+}
+
+/* Extra protection in case .hero img is stronger */
+.hero-facebook-share img {
+  width: 34px !important;
+  height: 34px !important;
+  max-width: 34px !important;
+  max-height: 34px !important;
+  object-fit: contain !important;
+}
+
+@media (max-width: 700px) {
+  .hero-facebook-share {
+    right: 22px;
+    bottom: 38px;
+  }
+
+  .facebook-share-button {
+    width: 34px;
+    height: 34px;
+  }
+
+  .facebook-share-icon {
+    width: 30px;
+    height: 30px;
+  }
+}
