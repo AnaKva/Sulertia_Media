@@ -1,10 +1,5 @@
-<<<<<<< HEAD
-import Link from "next/link";
 import DelayedRobot from "@/components/DelayedRobot";
-=======
-import WalkingRobot from "@/components/WalkingRobot";
 import SiteHeader from "@/components/SiteHeader";
->>>>>>> b6d1d4854f11613c1384ad3720a8f44f67b0daa3
 import { supabase } from "@/lib/supabaseClient";
 import { AdEditorial } from "@/components/AdBanner";
 import TypewriterStory from "@/components/TypewriterStory";
@@ -55,8 +50,7 @@ export default async function Page({
     );
   }
 
-  const postTitle =
-    lang === "en" ? post.title_en || post.title : post.title;
+  const postTitle = lang === "en" ? post.title_en || post.title : post.title;
 
   const postContent =
     lang === "en" ? post.content_en || post.content : post.content;
@@ -119,10 +113,6 @@ export default async function Page({
                 <AdEditorial />
               </div>
 
-<<<<<<< HEAD
-      <DelayedRobot />
-    </main>
-=======
               <footer>
                 <div className="article-footer">
                   <span>{text.verified}</span>
@@ -133,9 +123,8 @@ export default async function Page({
           </article>
         </section>
 
-        <WalkingRobot />
+        <DelayedRobot />
       </main>
     </>
->>>>>>> b6d1d4854f11613c1384ad3720a8f44f67b0daa3
   );
 }

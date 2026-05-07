@@ -1092,3 +1092,24 @@ font-family: "BPG Nino Mtavruli", Arial, Helvetica, sans-serif;
   0%, 100% { opacity: 1; }
   50%       { opacity: 0.2; }
 }
+
+/* ── Startup Splash Screen ── */
+.splash-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  opacity: 1;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+.splash-screen.splash-fading {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
