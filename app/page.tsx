@@ -1,5 +1,5 @@
 import Link from "next/link";
-import WalkingRobot from "@/components/WalkingRobot";
+import DelayedRobot from "@/components/DelayedRobot";
 import { supabase } from "@/lib/supabaseClient";
 import { AdEditorial } from "@/components/AdBanner";
 import TypewriterStory from "@/components/TypewriterStory";
@@ -146,7 +146,7 @@ export default async function Page({
         </article>
       </section>
 
-      <WalkingRobot />
+      <DelayedRobot />
     </main>
   );
 }
