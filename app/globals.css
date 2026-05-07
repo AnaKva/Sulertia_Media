@@ -264,6 +264,17 @@ font-family: "BPG Nino Mtavruli", Arial, Helvetica, sans-serif;
   border-bottom: none;
 }
 
+.numbered-content {
+  display: block;
+
+  /* ✅ critical for wrapping */
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
+
+  line-height: 1.6;
+}
+
 /* ── Typewriter animation ── */
 .typewriter-line {
   display: inline-block;
@@ -354,6 +365,44 @@ font-family: "BPG Nino Mtavruli", Arial, Helvetica, sans-serif;
   letter-spacing: 3px;
   text-transform: uppercase;
   font-size: 10px;
+}
+
+.ad-banner {
+  display: block;
+  width: 600px;
+  height: 130px;
+  margin: 5px auto 0 auto;
+  overflow: hidden;
+}
+
+/* shared image rules */
+.ad-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* default: desktop visible, mobile hidden */
+.mobile {
+  display: none;
+}
+
+/* MOBILE MODE */
+@media (max-width: 700px) {
+  .ad-banner {
+    width: 100%;
+    max-width: 600px;
+    height: 200px;
+  }
+
+  .desktop {
+    display: none;
+  }
+
+  .mobile {
+    display: block;
+  }
 }
 
 @keyframes ping {
@@ -448,6 +497,10 @@ font-family: "BPG Nino Mtavruli", Arial, Helvetica, sans-serif;
 }
 
 @media (max-width: 700px) {
+  #banner {
+    background-image: url("../public/images/Gemini-ad-mobile.png") center;
+  }
+
   .robot-wrapper {
     bottom: 12px;
     left: -90px;

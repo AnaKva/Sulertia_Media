@@ -8,18 +8,31 @@ interface Props {
 
 export default function TypewriterStory({ items }: Props) {
   const [displayedItems, setDisplayedItems] = useState<string[]>(
-    items.map(() => "")
+    items.map(() => ""),
   );
+
   const [currentItem, setCurrentItem] = useState(0);
   const [currentChar, setCurrentChar] = useState(0);
-  const [doneItems, setDoneItems] = useState<boolean[]>(items.map(() => false));
+  const [done, setDone] = useState(false);
   const [started, setStarted] = useState(false);
+
+  const [globalIndex, setGlobalIndex] = useState(-1);
+
   const rafRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const readRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     const startDelay = setTimeout(() => setStarted(true), 120);
     return () => clearTimeout(startDelay);
   }, []);
+
+  // flatten words once
+  const flatWords: { item: number; word: number }[] = [];
+  items.forEach((text, itemIndex) => {
+    text.split(" ").forEach((_, wordIndex) => {
+      flatWords.push({ item: itemIndex, word: wordIndex });
+    });
+  });
 
   useEffect(() => {
     if (!started) return;
@@ -37,15 +50,26 @@ export default function TypewriterStory({ items }: Props) {
         setCurrentChar((c) => c + 1);
       }, 22);
     } else {
-      setDoneItems((prev) => {
-        const next = [...prev];
-        next[currentItem] = true;
-        return next;
-      });
-      rafRef.current = setTimeout(() => {
-        setCurrentItem((i) => i + 1);
-        setCurrentChar(0);
-      }, 110);
+      setCurrentItem((i) => i + 1);
+      setCurrentChar(0);
+    }
+
+    // start reading after last line finishes
+    if (currentItem === items.length - 1 && currentChar >= text.length) {
+      setDone(true);
+
+      setTimeout(() => {
+        let i = 0;
+
+        readRef.current = setInterval(() => {
+          setGlobalIndex(i);
+          i++;
+
+          if (i >= flatWords.length) {
+            clearInterval(readRef.current!);
+          }
+        }, 350);
+      }, 400);
     }
 
     return () => {
@@ -55,26 +79,36 @@ export default function TypewriterStory({ items }: Props) {
 
   return (
     <div className="numbered-story">
-      {items.map((fullText, index) => {
-        const isActive = index === currentItem && started;
-        const isDone = doneItems[index];
-        const text = isDone || !started ? fullText : displayedItems[index];
+      {items.map((fullText, itemIndex) => {
+        const text = done || !started ? fullText : displayedItems[itemIndex];
+
+        const words = text.split(" ");
 
         return (
-          <div className="numbered-row" key={index}>
-            <span className="numbered-index">{index + 1}.</span>
-            <span
-              className={[
-                "numbered-content",
-                "typewriter-line",
-                isActive ? "typewriter-active" : "",
-                isDone ? "typewriter-done" : "",
-                !started ? "typewriter-done" : "",
-              ]
-                .filter(Boolean)
-                .join(" ")}
-            >
-              {text}
+          <div className="numbered-row" key={itemIndex}>
+            <span className="numbered-index">{itemIndex + 1}.</span>
+
+            <span className="numbered-content">
+              {words.map((word, wordIndex) => {
+                const flatPos = flatWords.findIndex(
+                  (w) => w.item === itemIndex && w.word === wordIndex,
+                );
+
+                const isActive = flatPos === globalIndex;
+
+                return (
+                  <span
+                    key={wordIndex}
+                    style={{
+                      color: isActive ? "orange" : "white",
+                      transition: "color 0.2s ease",
+                      display: "inline",
+                    }}
+                  >
+                    {word}&nbsp;
+                  </span>
+                );
+              })}
             </span>
           </div>
         );
