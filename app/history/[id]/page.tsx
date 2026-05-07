@@ -186,16 +186,6 @@ export default async function HistoryDetailPage({
                 )}
               </div>
 
-              <div className="share-row">
-                <FacebookShareButton
-                  url={`https://sulertia.media/history/${post.id}?lang=${lang}`}
-                  label={
-                    lang === "ka"
-                      ? "Facebook-ზე გაზიარება"
-                      : "Share on Facebook"
-                  }
-                />
-              </div>
 
               <div className="history-detail-actions">
                 <Link href={`/history?lang=${lang}`}>{text.backToHistory}</Link>
