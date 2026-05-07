@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Playfair_Display, Lora } from "next/font/google";
+import SplashScreen from "@/components/SplashScreen";
 
 const playfair = Playfair_Display({
   variable: "--font-playfair",
@@ -34,7 +35,10 @@ export default function RootLayout({
       lang="ka"
       className={`${playfair.variable} ${lora.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col">{children}</body>
+      <body className="min-h-full flex flex-col">
+        <SplashScreen />
+        {children}
+      </body>
     </html>
   );
 }

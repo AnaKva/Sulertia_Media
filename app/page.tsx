@@ -1,4 +1,4 @@
-import WalkingRobot from "@/components/WalkingRobot";
+import DelayedRobot from "@/components/DelayedRobot";
 import SiteHeader from "@/components/SiteHeader";
 import { supabase } from "@/lib/supabaseClient";
 import { AdEditorial } from "@/components/AdBanner";
@@ -51,8 +51,7 @@ export default async function Page({
     );
   }
 
-  const postTitle =
-    lang === "en" ? post.title_en || post.title : post.title;
+  const postTitle = lang === "en" ? post.title_en || post.title : post.title;
 
   const postContent =
     lang === "en" ? post.content_en || post.content : post.content;
@@ -139,7 +138,7 @@ export default async function Page({
           </article>
         </section>
 
-        <WalkingRobot />
+        <DelayedRobot />
       </main>
     </>
   );

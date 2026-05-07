@@ -264,6 +264,17 @@ font-family: "BPG Nino Mtavruli", Arial, Helvetica, sans-serif;
   border-bottom: none;
 }
 
+.numbered-content {
+  display: block;
+
+  /* ✅ critical for wrapping */
+  white-space: normal;
+  overflow-wrap: break-word;
+  word-break: break-word;
+
+  line-height: 1.6;
+}
+
 /* ── Typewriter animation ── */
 .typewriter-line {
   display: inline-block;
@@ -354,6 +365,44 @@ font-family: "BPG Nino Mtavruli", Arial, Helvetica, sans-serif;
   letter-spacing: 3px;
   text-transform: uppercase;
   font-size: 10px;
+}
+
+.ad-banner {
+  display: block;
+  width: 600px;
+  height: 130px;
+  margin: 5px auto 0 auto;
+  overflow: hidden;
+}
+
+/* shared image rules */
+.ad-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* default: desktop visible, mobile hidden */
+.mobile {
+  display: none;
+}
+
+/* MOBILE MODE */
+@media (max-width: 700px) {
+  .ad-banner {
+    width: 100%;
+    max-width: 600px;
+    height: 200px;
+  }
+
+  .desktop {
+    display: none;
+  }
+
+  .mobile {
+    display: block;
+  }
 }
 
 @keyframes ping {
@@ -448,6 +497,10 @@ font-family: "BPG Nino Mtavruli", Arial, Helvetica, sans-serif;
 }
 
 @media (max-width: 700px) {
+  #banner {
+    background-image: url("../public/images/Gemini-ad-mobile.png") center;
+  }
+
   .robot-wrapper {
     bottom: 12px;
     left: -90px;
@@ -1032,4 +1085,227 @@ font-family: "BPG Nino Mtavruli", Arial, Helvetica, sans-serif;
     width: 30px;
     height: 30px;
   }
+}
+
+/* ── Loading Screen (Signal Scan) ── */
+.loading-page {
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.loading-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(185, 90, 42, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(185, 90, 42, 0.06) 1px, transparent 1px);
+  background-size: 40px 40px;
+  animation: loadingGridFade 3s ease-in-out infinite alternate;
+}
+
+@keyframes loadingGridFade {
+  from {
+    opacity: 0.4;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.loading-scan-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(185, 90, 42, 0.7),
+    rgba(245, 239, 230, 0.4),
+    rgba(185, 90, 42, 0.7),
+    transparent
+  );
+  animation: loadingScanDown 2.4s linear infinite;
+  top: 0;
+}
+
+@keyframes loadingScanDown {
+  0% {
+    top: 0%;
+    opacity: 0;
+  }
+
+  5% {
+    opacity: 1;
+  }
+
+  95% {
+    opacity: 1;
+  }
+
+  100% {
+    top: 100%;
+    opacity: 0;
+  }
+}
+
+.loading-border-accent {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--orange);
+}
+
+.loading-logo {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+}
+
+.loading-wordmark {
+  font-family: "BPG Nino Mtavruli", Arial, Helvetica, sans-serif;
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--cream);
+}
+
+.loading-wordmark span {
+  display: inline-block;
+  margin-left: 5px;
+  vertical-align: super;
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.35em;
+  color: rgba(245, 239, 230, 0.4);
+}
+
+.loading-signal {
+  margin-top: 28px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 5px;
+  height: 28px;
+}
+
+.loading-bar {
+  width: 4px;
+  border-radius: 2px;
+  background: var(--orange);
+  animation: loadingBarPulse 1.1s ease-in-out infinite;
+  transform-origin: bottom;
+}
+
+.loading-bar:nth-child(1) {
+  height: 8px;
+  animation-delay: 0s;
+  background: rgba(185, 90, 42, 0.4);
+}
+
+.loading-bar:nth-child(2) {
+  height: 14px;
+  animation-delay: 0.1s;
+  background: rgba(185, 90, 42, 0.6);
+}
+
+.loading-bar:nth-child(3) {
+  height: 22px;
+  animation-delay: 0.2s;
+  background: var(--orange);
+}
+
+.loading-bar:nth-child(4) {
+  height: 18px;
+  animation-delay: 0.3s;
+  background: rgba(185, 90, 42, 0.7);
+}
+
+.loading-bar:nth-child(5) {
+  height: 10px;
+  animation-delay: 0.4s;
+  background: rgba(185, 90, 42, 0.5);
+}
+
+.loading-bar:nth-child(6) {
+  height: 24px;
+  animation-delay: 0.15s;
+  background: var(--orange);
+}
+
+.loading-bar:nth-child(7) {
+  height: 12px;
+  animation-delay: 0.35s;
+  background: rgba(185, 90, 42, 0.55);
+}
+
+@keyframes loadingBarPulse {
+  0%,
+  100% {
+    transform: scaleY(1);
+  }
+
+  50% {
+    transform: scaleY(0.35);
+  }
+}
+
+.loading-status {
+  margin-top: 22px;
+  font-size: 9px;
+  text-transform: uppercase;
+  letter-spacing: 0.38em;
+  color: rgba(245, 239, 230, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.loading-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #89c28c;
+  animation: loadingDotBlink 1.4s ease-in-out infinite;
+}
+
+@keyframes loadingDotBlink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.2;
+  }
+}
+
+/* ── Startup Splash Screen ── */
+.splash-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 999999;
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  opacity: 1;
+  transition: opacity 0.6s ease, visibility 0.6s ease;
+}
+
+.splash-screen.splash-fading {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
 }
