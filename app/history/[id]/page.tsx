@@ -1,9 +1,10 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import SiteHeader from "@/components/SiteHeader";
+import FacebookShareButton from "@/components/FacebookShareButton";
 import { supabase } from "@/lib/supabaseClient";
 import { getDailyImageForDate } from "@/lib/getDailyImage";
-import LanguageSwitch from "@/components/LanguageSwitch";
 import { getLang, t } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
@@ -42,7 +43,9 @@ export async function generateMetadata({
   const postContent =
     lang === "en" ? post.content_en || post.content : post.content;
 
-  const image = getDailyImageForDate(post.created_at);
+  const image = `https://sulertia.media${getDailyImageForDate(
+    post.created_at
+  )}`;
 
   const description =
     typeof postContent === "string"
@@ -129,82 +132,75 @@ export default async function HistoryDetailPage({
       ?.map((item: string) => item.trim()) || [];
 
   return (
-    <main className="page">
-      <header className="top-header">
-        <div className="top-header-inner">
-          <Link href={`/?lang=${lang}`} className="logo-link">
-            <div className="logo">
-              SULERTIA
-              <span>MEDIA</span>
-            </div>
-          </Link>
+    <>
+      <SiteHeader lang={lang} />
 
-          <nav className="nav">
-            <Link href={`/?lang=${lang}`} className="nav-link">
-              {text.aiScanning}
-            </Link>
+      <main className="page">
+        <section className="content-shell">
+          <article className="article-card">
+            <div className="hero">
+              <img src={image} alt={postTitle} />
 
-            <Link href={`/history?lang=${lang}`} className="nav-link">
-              {text.historyVault}
-            </Link>
+              <div className="hero-overlay" />
 
-            <LanguageSwitch lang={lang} />
-          </nav>
-        </div>
-      </header>
+              <div className="hero-content">
+                <div className="meta-row">
+                  <span className="category">{postCategory}</span>
 
-      <section className="content-shell">
-        <article className="article-card">
-          <div className="hero">
-            <img src={image} alt={postTitle} />
-
-            <div className="hero-overlay" />
-
-            <div className="hero-content">
-              <div className="meta-row">
-                <span className="category">{postCategory}</span>
-
-                <span className="date-score">
-                  {formattedDate} · {text.score}:{" "}
-                  {post.importance_score || "8.5"}
-                </span>
-              </div>
+                  <span className="date-score">
+                    {formattedDate} · {text.score}:{" "}
+                    {post.importance_score || "8.5"}
+                  </span>
+                </div>
 
               <h1>{postTitle}</h1>
-            </div>
+
+          <div className="hero-facebook-share">
+            <FacebookShareButton
+              url={`https://sulertia.media/history/${post.id}?lang=${lang}`}
+              label={
+                lang === "ka"
+                  ? "Facebook-ზე გაზიარება"
+                  : "Share on Facebook"
+              }
+            />
           </div>
-
-          <div className="article-body">
-            <div className="story-text numbered-story">
-              {storyItems.length > 0 ? (
-                storyItems.map((item: string, index: number) => {
-                  const cleanText = item.replace(/^\d+\.\s*/, "").trim();
-
-                  return (
-                    <div className="numbered-row" key={index}>
-                      <span className="numbered-index">{index + 1}.</span>
-                      <span className="numbered-content">{cleanText}</span>
-                    </div>
-                  );
-                })
-              ) : (
-                <p>{postContent}</p>
-              )}
-            </div>
-
-            <div className="history-detail-actions">
-              <Link href={`/history?lang=${lang}`}>{text.backToHistory}</Link>
-            </div>
-
-            <footer>
-              <div className="article-footer">
-                <span>{text.archived}</span>
-                <span>{formattedDate}</span>
               </div>
-            </footer>
-          </div>
-        </article>
-      </section>
-    </main>
+            </div>
+
+            <div className="article-body">
+              <div className="story-text numbered-story">
+                {storyItems.length > 0 ? (
+                  storyItems.map((item: string, index: number) => {
+                    const cleanText = item.replace(/^\d+\.\s*/, "").trim();
+
+                    return (
+                      <div className="numbered-row" key={index}>
+                        <span className="numbered-index">{index + 1}.</span>
+                        <span className="numbered-content">{cleanText}</span>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <p>{postContent}</p>
+                )}
+              </div>
+
+
+              <div className="history-detail-actions">
+                <Link href={`/history?lang=${lang}`}>{text.backToHistory}</Link>
+              </div>
+
+              <footer>
+                <div className="article-footer">
+                  <span>{text.archived}</span>
+                  <span>{formattedDate}</span>
+                </div>
+              </footer>
+            </div>
+          </article>
+        </section>
+      </main>
+    </>
   );
 }
