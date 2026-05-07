@@ -1,32 +1,48 @@
 import os
+import re
 import time
-import uuid
-from urllib.parse import quote_plus
-from datetime import datetime, timedelta
-
 import feedparser
-import pytz
 import requests
-from bs4 import BeautifulSoup
-from dotenv import load_dotenv
-from google import genai
-from google.genai import types as genai_types
-from groq import Groq
-from supabase import create_client
+import pytz
 
+from groq import Groq
+from bs4 import BeautifulSoup
+from datetime import datetime, timedelta
+from supabase import create_client
+from dotenv import load_dotenv
 
 load_dotenv()
 
-# ── Config ───────────────────────────────────────────────────────────────────
-
-GEORGIA_TZ = pytz.timezone("Asia/Tbilisi")
+# ── Environment ───────────────────────────────────────────────────────────────
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_SERVICE_KEY = os.getenv("SUPABASE_SERVICE_KEY")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 
-DEFAULT_IMAGE = "https://sulertia.media/default-ai-style.jpg"
+missing_env = []
+
+if not SUPABASE_URL:
+    missing_env.append("SUPABASE_URL")
+
+if not SUPABASE_SERVICE_KEY:
+    missing_env.append("SUPABASE_SERVICE_KEY")
+
+if not GROQ_API_KEY:
+    missing_env.append("GROQ_API_KEY")
+
+if missing_env:
+    raise RuntimeError(f"Missing environment variables: {', '.join(missing_env)}")
+
+
+# ── Clients ──────────────────────────────────────────────────────────────────
+
+supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
+groq_client = Groq(api_key=GROQ_API_KEY)
+
+
+# ── Config ───────────────────────────────────────────────────────────────────
+
+GEORGIA_TZ = pytz.timezone("Asia/Tbilisi")
 
 SOURCES = {
     "OpenAI": "https://openai.com/news/rss.xml",
@@ -37,121 +53,204 @@ SOURCES = {
 }
 
 
-# ── Safety checks ─────────────────────────────────────────────────────────────
+# ── Helpers ──────────────────────────────────────────────────────────────────
 
-required_env = {
-    "SUPABASE_URL": SUPABASE_URL,
-    "SUPABASE_SERVICE_KEY": SUPABASE_SERVICE_KEY,
-    "GROQ_API_KEY": GROQ_API_KEY,
-}
+def clean_text(value):
+    if not value:
+        return ""
 
-missing = [key for key, value in required_env.items() if not value]
-
-if missing:
-    raise RuntimeError(f"Missing environment variables: {', '.join(missing)}")
+    value = BeautifulSoup(value, "html.parser").get_text(" ")
+    value = re.sub(r"\s+", " ", value)
+    return value.strip()
 
 
-# ── Clients ──────────────────────────────────────────────────────────────────
+def clamp_score(score):
+    try:
+        score = float(score)
+    except Exception:
+        return 8.5
 
-supabase = create_client(SUPABASE_URL, SUPABASE_SERVICE_KEY)
-groq_client = Groq(api_key=GROQ_API_KEY)
+    if score < 1:
+        return 1.0
 
-gemini_client = None
-if GEMINI_API_KEY:
-    gemini_client = genai.Client(api_key=GEMINI_API_KEY)
-else:
-    print("⚠️ GEMINI_API_KEY missing. Gemini image generation will be skipped.")
+    if score > 10:
+        return 10.0
+
+    return round(score, 1)
 
 
-# ── News gathering ────────────────────────────────────────────────────────────
+def parse_ai_response(result_text):
+    try:
+        score_match = re.search(r"SCORE:\s*([0-9]+(?:\.[0-9]+)?)", result_text)
+        georgian_match = re.search(
+            r"GEORGIAN:\s*(.*?)(?=\n\s*ENGLISH:)",
+            result_text,
+            re.DOTALL,
+        )
+        english_match = re.search(
+            r"ENGLISH:\s*(.*)$",
+            result_text,
+            re.DOTALL,
+        )
+
+        if not score_match or not georgian_match or not english_match:
+            raise ValueError("AI response format was not correct.")
+
+        score = clamp_score(score_match.group(1))
+        georgian_content = georgian_match.group(1).strip()
+        english_content = english_match.group(1).strip()
+
+        return georgian_content, english_content, score
+
+    except Exception as error:
+        print(f"⚠️ Could not parse AI response. Error: {error}")
+        print("⚠️ Raw AI response:")
+        print(result_text)
+
+        return result_text.strip(), result_text.strip(), 8.5
+
+
+# ── News Gathering ────────────────────────────────────────────────────────────
 
 def fetch_anthropic_news():
-    """
-    Anthropic does not use the same RSS style here, so this scrapes their news page.
-    This may break if Anthropic changes their website HTML.
-    """
+    print("🔎 Fetching Anthropic news...")
+
     try:
-        r = requests.get(
+        response = requests.get(
             SOURCES["Anthropic"],
             timeout=15,
-            headers={"User-Agent": "SulertiaMedia/1.0"},
+            headers={
+                "User-Agent": "Mozilla/5.0 SulertiaMediaBot/1.0",
+            },
         )
-        r.raise_for_status()
+        response.raise_for_status()
 
-        soup = BeautifulSoup(r.text, "html.parser")
-
+        soup = BeautifulSoup(response.text, "html.parser")
         news_items = []
 
-        for tag in soup.find_all(["h2", "h3"]):
-            title = tag.get_text(separator=" ").strip()
+        for tag in soup.find_all(["h1", "h2", "h3"]):
+            title = clean_text(tag.get_text(" "))
 
             if len(title) < 15:
                 continue
 
-            if any(
-                word in title.lower()
-                for word in [
-                    "skip",
-                    "content",
-                    "menu",
-                    "logo",
-                    "navigation",
-                    "search",
-                    "sign in",
-                    "subscribe",
-                ]
-            ):
+            lowered = title.lower()
+
+            blocked_words = [
+                "skip",
+                "content",
+                "menu",
+                "logo",
+                "navigation",
+                "search",
+                "sign in",
+                "subscribe",
+                "privacy",
+                "terms",
+                "careers",
+            ]
+
+            if any(word in lowered for word in blocked_words):
                 continue
 
-            news_items.append({"title": title, "source": "Anthropic"})
+            news_items.append(
+                {
+                    "title": title,
+                    "source": "Anthropic",
+                }
+            )
 
-        return news_items[:3]
+        unique_items = []
+        seen_titles = set()
 
-    except Exception as e:
-        print(f"⚠️ Anthropic scrape error: {e}")
+        for item in news_items:
+            key = item["title"].lower()
+
+            if key not in seen_titles:
+                seen_titles.add(key)
+                unique_items.append(item)
+
+        return unique_items[:3]
+
+    except Exception as error:
+        print(f"⚠️ Anthropic scrape error: {error}")
+        return []
+
+
+def fetch_rss_news(source_name, url):
+    print(f"🔎 Fetching {source_name} RSS...")
+
+    try:
+        feed = feedparser.parse(url)
+        items = []
+
+        for entry in feed.entries[:5]:
+            title = clean_text(getattr(entry, "title", ""))
+
+            if not title:
+                continue
+
+            items.append(
+                {
+                    "title": title,
+                    "source": source_name,
+                }
+            )
+
+        return items[:3]
+
+    except Exception as error:
+        print(f"⚠️ Feed error ({source_name}): {error}")
         return []
 
 
 def gather_exactly_7():
-    """
-    Collects exactly 7 news items from multiple AI-related sources.
-    It first tries to take one from each source for diversity, then fills the rest.
-    """
+    print("🧠 Gathering AI news...")
+
     temp_pool = {}
 
-    for name, url in SOURCES.items():
-        if name == "Anthropic":
-            temp_pool[name] = fetch_anthropic_news()
-            continue
-
-        try:
-            feed = feedparser.parse(url)
-
-            temp_pool[name] = [
-                {"title": entry.title, "source": name}
-                for entry in feed.entries[:4]
-                if hasattr(entry, "title") and len(entry.title.strip()) > 8
-            ]
-
-        except Exception as e:
-            print(f"⚠️ Feed error ({name}): {e}")
-            temp_pool[name] = []
+    for source_name, url in SOURCES.items():
+        if source_name == "Anthropic":
+            temp_pool[source_name] = fetch_anthropic_news()
+        else:
+            temp_pool[source_name] = fetch_rss_news(source_name, url)
 
     collected = []
 
-    for name in list(temp_pool.keys()):
-        if temp_pool[name]:
-            collected.append(temp_pool[name].pop(0))
+    # First, take one from each source for diversity.
+    for source_name in temp_pool.keys():
+        if temp_pool[source_name]:
+            collected.append(temp_pool[source_name].pop(0))
 
-    all_remaining = [item for items in temp_pool.values() for item in items]
+    # Then fill remaining slots.
+    remaining = []
 
-    while len(collected) < 7 and all_remaining:
-        collected.append(all_remaining.pop(0))
+    for items in temp_pool.values():
+        remaining.extend(items)
+
+    seen_titles = {item["title"].lower() for item in collected}
+
+    for item in remaining:
+        if len(collected) >= 7:
+            break
+
+        key = item["title"].lower()
+
+        if key in seen_titles:
+            continue
+
+        seen_titles.add(key)
+        collected.append(item)
+
+    print(f"✅ Found {len(collected)} news items.")
+
+    for index, item in enumerate(collected, start=1):
+        print(f"{index}. [{item['source']}] {item['title']}")
 
     return collected[:7]
 
 
-# ── Text generation ───────────────────────────────────────────────────────────
+# ── Text Generation ───────────────────────────────────────────────────────────
 
 def generate_digest_and_score(digest_list):
     context = "\n".join(
@@ -159,217 +258,72 @@ def generate_digest_and_score(digest_list):
     )
 
     system_prompt = (
-        "შენ ხარ პროფესიონალი ქართველი რედაქტორი და ტექნოლოგიური ჟურნალისტი. "
-        "წერ ბუნებრივ, გამართულ, მოკლე და სუფთა ქართულად. "
-        "არ გამოიყენო ზედმეტად რთული სიტყვები. ტექსტი უნდა ჟღერდეს როგორც კარგი ქართული მედიის დაიჯესტი."
+        "You are a professional AI news editor for Sulertia Media. "
+        "You write clear, accurate, short, and natural summaries. "
+        "For Georgian, do not use literal translation. Use fluent Georgian. "
+        "For English, use clean modern news language. "
+        "You must follow the requested output format exactly."
     )
 
     user_prompt = (
-        f"Analyze these 7 AI news items:\n{context}\n\n"
+        f"Analyze these AI news items:\n{context}\n\n"
         "Task:\n"
         "1. Create a 7-item numbered list in natural Georgian.\n"
-        "2. Each item should be one clear sentence.\n"
-        "3. Avoid literal translation. Make it sound natural.\n"
-        "4. Assign one overall Importance Score from 1.0 to 10.0.\n\n"
+        "2. Create the same 7-item numbered list in clean English.\n"
+        "3. Assign one overall Importance Score from 1.0 to 10.0.\n\n"
+        "Rules:\n"
+        "- Keep every point concise.\n"
+        "- Do not invent company announcements that are not implied by the titles.\n"
+        "- Do not mention sources unless useful.\n"
+        "- Georgian must sound natural, not translated word-for-word.\n"
+        "- English must have the same meaning as Georgian.\n\n"
         "Format exactly like this:\n"
         "SCORE: [number]\n"
-        "LIST:\n"
-        "1. [sentence]\n"
-        "2. [sentence]\n"
-        "3. [sentence]\n"
-        "4. [sentence]\n"
-        "5. [sentence]\n"
-        "6. [sentence]\n"
-        "7. [sentence]"
+        "GEORGIAN:\n"
+        "1. [Georgian sentence]\n"
+        "2. [Georgian sentence]\n"
+        "3. [Georgian sentence]\n"
+        "4. [Georgian sentence]\n"
+        "5. [Georgian sentence]\n"
+        "6. [Georgian sentence]\n"
+        "7. [Georgian sentence]\n\n"
+        "ENGLISH:\n"
+        "1. [English sentence]\n"
+        "2. [English sentence]\n"
+        "3. [English sentence]\n"
+        "4. [English sentence]\n"
+        "5. [English sentence]\n"
+        "6. [English sentence]\n"
+        "7. [English sentence]"
     )
+
+    print("✍️ Generating Georgian and English digest...")
 
     response = groq_client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         messages=[
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
+            {
+                "role": "system",
+                "content": system_prompt,
+            },
+            {
+                "role": "user",
+                "content": user_prompt,
+            },
         ],
-        temperature=0.55,
+        temperature=0.45,
     )
 
     result_text = response.choices[0].message.content.strip()
 
-    try:
-        score_text = result_text.split("SCORE:")[1].split("\n")[0].strip()
-        score = float(score_text)
+    georgian_content, english_content, score = parse_ai_response(result_text)
 
-        content = result_text.split("LIST:")[1].strip()
-
-    except Exception:
-        print("⚠️ Could not parse AI response format. Using fallback score.")
-        score = 8.5
-        content = result_text
-
-    return content, score
+    return georgian_content, english_content, score
 
 
-# ── Image generation ──────────────────────────────────────────────────────────
+# ── Supabase Update ───────────────────────────────────────────────────────────
 
-def build_image_prompt(main_topic):
-    return (
-        f"Create a premium editorial hero image for an AI news website article about: {main_topic}. "
-        "Style: futuristic, cyber-minimalist, dark navy background, subtle orange accents, cinematic lighting, "
-        "clean composition, high-tech atmosphere, abstract technology visuals, no text, no watermark, no logos, "
-        "16:9 aspect ratio."
-    )
-
-
-def get_public_url(bucket_name, file_name):
-    result = supabase.storage.from_(bucket_name).get_public_url(file_name)
-
-    if isinstance(result, str):
-        return result
-
-    if isinstance(result, dict):
-        return (
-            result.get("publicUrl")
-            or result.get("publicURL")
-            or result.get("public_url")
-            or result.get("data", {}).get("publicUrl")
-            or result.get("data", {}).get("publicURL")
-            or result.get("data", {}).get("public_url")
-        )
-
-    return None
-
-
-def upload_image_to_supabase(image_bytes, ext="png", content_type="image/png"):
-    file_name = f"news_{int(time.time())}_{uuid.uuid4().hex[:8]}.{ext}"
-
-    supabase.storage.from_("images").upload(
-        file_name,
-        image_bytes,
-        {
-            "content-type": content_type,
-            "upsert": "true",
-        },
-    )
-
-    public_url = get_public_url("images", file_name)
-
-    if not public_url:
-        print("⚠️ Could not get public URL from Supabase Storage.")
-        return DEFAULT_IMAGE
-
-    return public_url
-
-
-def generate_visual_gemini(main_topic):
-    """
-    Primary image generation.
-    Uses Gemini/Imagen if GEMINI_API_KEY is available.
-    """
-    if not gemini_client:
-        return None
-
-    print(f"🎨 Gemini image generation: {main_topic}")
-
-    image_prompt = build_image_prompt(main_topic)
-
-    try:
-        response = gemini_client.models.generate_images(
-            model="imagen-3.0-generate-002",
-            prompt=image_prompt,
-            config=genai_types.GenerateImagesConfig(
-                number_of_images=1,
-                aspect_ratio="16:9",
-                output_mime_type="image/png",
-            ),
-        )
-
-        if not response.generated_images:
-            raise RuntimeError("Gemini returned no generated images.")
-
-        image_bytes = response.generated_images[0].image.image_bytes
-
-        if not image_bytes:
-            raise RuntimeError("Gemini returned empty image bytes.")
-
-        return upload_image_to_supabase(
-            image_bytes=image_bytes,
-            ext="png",
-            content_type="image/png",
-        )
-
-    except Exception as e:
-        print(f"⚠️ Gemini image error: {e}")
-        return None
-
-
-def generate_visual_pollinations(main_topic):
-    """
-    Free fallback image generation using Pollinations.
-    """
-    print(f"🎨 Pollinations fallback: {main_topic}")
-
-    image_prompt = build_image_prompt(main_topic)
-    encoded_prompt = quote_plus(image_prompt)
-
-    image_url = (
-        f"https://image.pollinations.ai/prompt/{encoded_prompt}"
-        f"?width=1024&height=576&nologo=true&model=flux"
-    )
-
-    try:
-        response = requests.get(
-            image_url,
-            timeout=60,
-            headers={"User-Agent": "SulertiaMedia/1.0"},
-        )
-        response.raise_for_status()
-
-        content_type = response.headers.get("content-type", "image/png").lower()
-
-        if "jpeg" in content_type or "jpg" in content_type:
-            ext = "jpg"
-            final_content_type = "image/jpeg"
-        elif "webp" in content_type:
-            ext = "webp"
-            final_content_type = "image/webp"
-        else:
-            ext = "png"
-            final_content_type = "image/png"
-
-        return upload_image_to_supabase(
-            image_bytes=response.content,
-            ext=ext,
-            content_type=final_content_type,
-        )
-
-    except Exception as e:
-        print(f"⚠️ Pollinations error: {e}")
-        return None
-
-
-def generate_visual(main_topic):
-    """
-    Image pipeline:
-    1. Gemini/Imagen if available
-    2. Pollinations fallback
-    3. Default image fallback
-    """
-    gemini_url = generate_visual_gemini(main_topic)
-
-    if gemini_url:
-        return gemini_url
-
-    pollinations_url = generate_visual_pollinations(main_topic)
-
-    if pollinations_url:
-        return pollinations_url
-
-    print("⚠️ All image generation failed. Using default image.")
-    return DEFAULT_IMAGE
-
-
-# ── Supabase update ───────────────────────────────────────────────────────────
-
-def update_current_post(content, score, image_url):
+def update_current_post(content, content_en, score):
     now = datetime.now(GEORGIA_TZ)
 
     next_post_at = (now + timedelta(days=1)).replace(
@@ -381,29 +335,37 @@ def update_current_post(content, score, image_url):
 
     print("🔄 Updating Supabase...")
 
+    # Archive old current posts.
     supabase.table("posts").update(
-        {"is_current": False}
+        {
+            "is_current": False,
+        }
     ).eq("is_current", True).execute()
 
-    supabase.table("posts").insert(
+    # Insert new post with both Georgian and English fields.
+    result = supabase.table("posts").insert(
         {
             "title": "Daily AI Report: 7 მთავარი მოვლენა",
+            "title_en": "Daily AI Report: 7 Key Updates",
             "content": content,
-            "image_url": image_url,
+            "content_en": content_en,
+            "image_url": None,
             "importance_score": score,
-            "category": "Artificial Intelligence",
+            "category": "ხელოვნური ინტელექტი",
+            "category_en": "Artificial Intelligence",
             "is_current": True,
             "next_post_at": next_post_at.isoformat(),
         }
     ).execute()
 
     print(f"✅ New post inserted. Score: {score}")
+    return result
 
 
-# ── Main runner ───────────────────────────────────────────────────────────────
+# ── Runner ───────────────────────────────────────────────────────────────────
 
 def run_brain_once():
-    print("🚀 Sulertia Media brain started.")
+    print("🚀 Sulertia Media Brain started.")
 
     digest_list = gather_exactly_7()
 
@@ -411,22 +373,46 @@ def run_brain_once():
         print(f"⚠️ Could not collect 7 news items. Found: {len(digest_list)}")
         return
 
-    print("🧠 Generating Georgian digest...")
-    content, score = generate_digest_and_score(digest_list)
+    content, content_en, score = generate_digest_and_score(digest_list)
 
-    main_topic = f"{digest_list[0]['title']} / {digest_list[1]['title']}"
+    print("🇬🇪 Georgian content:")
+    print(content)
 
-    print("🖼️ Generating hero image...")
-    image_url = generate_visual(main_topic)
+    print("\n🇬🇧 English content:")
+    print(content_en)
 
     update_current_post(
         content=content,
+        content_en=content_en,
         score=score,
-        image_url=image_url,
     )
 
-    print("🎉 Sulertia Media update complete.")
+
+def run_brain_loop():
+    print("🚀 Sulertia Media Brain loop active.")
+    last_post_date = None
+
+    while True:
+        now = datetime.now(GEORGIA_TZ)
+        today = now.date()
+
+        if now.hour == 7 and now.minute < 5 and last_post_date != today:
+            try:
+                run_brain_once()
+                last_post_date = today
+
+            except Exception as error:
+                print(f"❌ Brain error: {error}")
+
+            time.sleep(600)
+
+        time.sleep(30)
 
 
 if __name__ == "__main__":
-    run_brain_once()
+    # GitHub Actions should run one post and stop.
+    # Local/server loop can be enabled with RUN_LOOP=true.
+    if os.getenv("RUN_LOOP", "false").lower() == "true":
+        run_brain_loop()
+    else:
+        run_brain_once()
