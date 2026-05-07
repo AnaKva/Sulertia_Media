@@ -1,8 +1,7 @@
-import Link from "next/link";
 import type { Metadata } from "next";
-import { supabase } from "@/lib/supabaseClient";
+import SiteHeader from "@/components/SiteHeader";
 import HistorySearch from "@/components/HistorySearch";
-import LanguageSwitch from "@/components/LanguageSwitch";
+import { supabase } from "@/lib/supabaseClient";
 import { getLang, t } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
@@ -32,74 +31,25 @@ export default async function HistoryPage({
     .order("created_at", { ascending: false })
     .limit(100);
 
-  if (error) {
-    return (
+  return (
+    <>
+      <SiteHeader lang={lang} />
+
       <main className="history-page">
-        <header className="top-header">
-          <div className="top-header-inner">
-            <Link href={`/?lang=${lang}`} className="logo-link">
-              <div className="logo">
-                SULERTIA
-                <span>MEDIA</span>
-              </div>
-            </Link>
-
-            <nav className="nav">
-              <Link href={`/?lang=${lang}`} className="nav-link">
-                {text.aiScanning}
-              </Link>
-
-              <Link href={`/history?lang=${lang}`} className="nav-link">
-                {text.historyVault}
-              </Link>
-
-              <LanguageSwitch lang={lang} />
-            </nav>
-          </div>
-        </header>
-
         <section className="history-shell">
-          <h1>{text.historyTitle}</h1>
-          <p className="history-error">Could not load archived posts.</p>
+          <div className="history-heading">
+            <p>Archived Intelligence</p>
+            <h1>{text.historyTitle}</h1>
+            <span>{text.historySubtitle}</span>
+          </div>
+
+          {error ? (
+            <p className="history-error">Could not load archived posts.</p>
+          ) : (
+            <HistorySearch posts={posts || []} lang={lang} />
+          )}
         </section>
       </main>
-    );
-  }
-
-  return (
-    <main className="history-page">
-      <header className="top-header">
-        <div className="top-header-inner">
-          <Link href={`/?lang=${lang}`} className="logo-link">
-            <div className="logo">
-              SULERTIA
-              <span>MEDIA</span>
-            </div>
-          </Link>
-
-          <nav className="nav">
-            <Link href={`/?lang=${lang}`} className="nav-link">
-              {text.aiScanning}
-            </Link>
-
-            <Link href={`/history?lang=${lang}`} className="nav-link">
-              {text.historyVault}
-            </Link>
-
-            <LanguageSwitch lang={lang} />
-          </nav>
-        </div>
-      </header>
-
-      <section className="history-shell">
-        <div className="history-heading">
-          <p>Archived Intelligence</p>
-          <h1>{text.historyTitle}</h1>
-          <span>{text.historySubtitle}</span>
-        </div>
-
-        <HistorySearch posts={posts || []} lang={lang} />
-      </section>
-    </main>
+    </>
   );
 }

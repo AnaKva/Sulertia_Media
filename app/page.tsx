@@ -1,11 +1,10 @@
-import Link from "next/link";
 import WalkingRobot from "@/components/WalkingRobot";
+import SiteHeader from "@/components/SiteHeader";
 import { supabase } from "@/lib/supabaseClient";
 import { AdEditorial } from "@/components/AdBanner";
 import TypewriterStory from "@/components/TypewriterStory";
 import { getDailyImage } from "@/lib/getDailyImage";
 import { getLang, t } from "@/lib/i18n";
-import LanguageSwitch from "@/components/LanguageSwitch";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -38,12 +37,16 @@ export default async function Page({
 
   if (error || !post) {
     return (
-      <main className="offline-page">
-        <div className="offline-box">
-          <span className="offline-dot" />
-          <p>{text.waiting}</p>
-        </div>
-      </main>
+      <>
+        <SiteHeader lang={lang} />
+
+        <main className="offline-page">
+          <div className="offline-box">
+            <span className="offline-dot" />
+            <p>{text.waiting}</p>
+          </div>
+        </main>
+      </>
     );
   }
 
@@ -73,80 +76,56 @@ export default async function Page({
       ?.map((item: string) => item.replace(/^\d+\.\s*/, "").trim()) || [];
 
   return (
-    <main className="page">
-      <header className="top-header">
-        <div className="top-header-inner">
-          <Link href={`/?lang=${lang}`} className="logo-link">
-            <div className="logo">
-              SULERTIA
-              <span>MEDIA</span>
+    <>
+      <SiteHeader lang={lang} />
+
+      <main className="page">
+        <section className="content-shell">
+          <article className="article-card">
+            <div className="hero">
+              <img src={getDailyImage()} alt={postTitle} />
+
+              <div className="hero-overlay" />
+
+              <div className="hero-content">
+                <div className="meta-row">
+                  <span className="category">{postCategory}</span>
+
+                  <span className="date-score">
+                    {formattedDate} · {text.score}:{" "}
+                    {post.importance_score || "8.5"}
+                  </span>
+                </div>
+
+                <h1>{postTitle}</h1>
+              </div>
             </div>
-          </Link>
 
-          <nav className="nav">
-            <div className="scan-status">
-              <span />
-              {text.aiScanning}
-            </div>
-
-            <Link href={`/about?lang=${lang}`} className="nav-link">
-              About
-            </Link>
-
-            <Link href={`/history?lang=${lang}`} className="nav-link">
-              {text.historyVault}
-            </Link>
-
-            <LanguageSwitch lang={lang} />
-          </nav>
-        </div>
-      </header>
-
-      <section className="content-shell">
-        <article className="article-card">
-          <div className="hero">
-            <img src={getDailyImage()} alt={postTitle} />
-
-            <div className="hero-overlay" />
-
-            <div className="hero-content">
-              <div className="meta-row">
-                <span className="category">{postCategory}</span>
-
-                <span className="date-score">
-                  {formattedDate} · {text.score}:{" "}
-                  {post.importance_score || "8.5"}
-                </span>
+            <div className="article-body">
+              <div className="story-text">
+                {storyItems.length > 0 ? (
+                  <TypewriterStory items={storyItems} />
+                ) : (
+                  <p>{postContent}</p>
+                )}
               </div>
 
-              <h1>{postTitle}</h1>
-            </div>
-          </div>
-
-          <div className="article-body">
-            <div className="story-text">
-              {storyItems.length > 0 ? (
-                <TypewriterStory items={storyItems} />
-              ) : (
-                <p>{postContent}</p>
-              )}
-            </div>
-
-            <div className="ad-wrap">
-              <AdEditorial />
-            </div>
-
-            <footer>
-              <div className="article-footer">
-                <span>{text.verified}</span>
-                <span>{formattedDate}</span>
+              <div className="ad-wrap">
+                <AdEditorial />
               </div>
-            </footer>
-          </div>
-        </article>
-      </section>
 
-      <WalkingRobot />
-    </main>
+              <footer>
+                <div className="article-footer">
+                  <span>{text.verified}</span>
+                  <span>{formattedDate}</span>
+                </div>
+              </footer>
+            </div>
+          </article>
+        </section>
+
+        <WalkingRobot />
+      </main>
+    </>
   );
 }
